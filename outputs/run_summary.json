@@ -1,0 +1,22 @@
+{
+  "n_games": 72,
+  "n_teams": 12,
+  "n_home_and_home_pairs": 72,
+  "margin_logistic": {
+    "a": 0.15950448945658635,
+    "b": -1.5516168281028027,
+    "h": 2.0,
+    "n_obs": 72
+  },
+  "matchup_logistic": {
+    "a": 1.5996351870387213,
+    "b": 0.697257575293456,
+    "n_obs": 72
+  },
+  "regular_season_pi_favorite_accuracy": {
+    "n": 72,
+    "correct": 56,
+    "accuracy": 0.7777777777777778
+  },
+  "data_source_note": "data/sample/demo_season.csv"
+}

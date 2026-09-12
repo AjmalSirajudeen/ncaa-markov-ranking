@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Large / user-supplied data (keep sample/)
+data/raw/*
+!data/raw/.gitkeep
+!data/raw/README.md
+*.parquet
+*.zip
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Secrets
+*.pem
+credentials.json
+kaggle.json
