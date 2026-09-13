@@ -1,5 +1,7 @@
 # NCAA Markov Ranking
 
+**Interactive report:** [open the charts](https://ajmalsirajudeen.github.io/ncaa-markov-ranking/)
+
 This repository is a modern Python reimplementation of an analytics project originally completed during my graduate studies at Cornell University.
 
 In grad school, my team built a logistic regression / Markov chain (LRMC) model to rank NCAA Division I men’s basketball teams and predict tournament games, following the approach in Kvam & Sokol (2006). We worked from regular-season results, fit logistic models on score margins, built a transition matrix across teams, and ranked teams by steady-state probability.

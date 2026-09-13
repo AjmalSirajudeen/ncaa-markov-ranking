@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NCAA Markov Ranking</title>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <style>
+    :root {
+      --ink: #1c1917;
+      --muted: #57534e;
+      --line: #e7e5e4;
+      --bg: #f7f5f2;
+      --card: #fff;
+      --accent: #1d4ed8;
+      --warn: #9a3412;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font: 16px/1.55 ui-sans-serif, system-ui, sans-serif;
+    }
+    main { max-width: 960px; margin: 0 auto; padding: 32px 20px 72px; }
+    h1 { font-size: 1.7rem; letter-spacing: -0.02em; margin: 0 0 8px; }
+    h2 { font-size: 1.15rem; margin: 28px 0 8px; }
+    p, li { color: var(--muted); }
+    code { font-size: 0.9em; }
+    a { color: var(--accent); }
+    .note {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      color: var(--warn);
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 0.94rem;
+    }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 18px; }
+    .tabs button {
+      border: 1px solid var(--line);
+      background: #fff;
+      padding: 8px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      color: var(--ink);
+    }
+    .tabs button.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+    .panel { display: none; }
+    .panel.on { display: block; }
+    .chart {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 8px 8px 4px;
+      margin: 16px 0;
+    }
+    .hint { font-size: 0.9rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.92rem; background: #fff; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+    th { cursor: pointer; user-select: none; background: #fafaf9; }
+    th:hover { color: var(--accent); }
+    img.report {
+      width: 100%;
+      max-width: 720px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+    }
+    .err { color: #b91c1c; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>NCAA Markov Ranking</h1>
+    <p>Hover, zoom, and click a team to see its games. This page reads the demo outputs already in the repo. It is not a new model.</p>
+    <p class="note">Original Cornell Study results and Current Python Reimplementation results are on separate tabs. Do not mix them.</p>
+
+    <div class="tabs">
+      <button class="on" data-tab="demo">Current Python Reimplementation</button>
+      <button data-tab="orig">Original Cornell Study</button>
+    </div>
+
+    <section id="demo" class="panel on">
+      <p>Synthetic 12-team / 72-game season from <code>data/sample/demo_season.csv</code>. These numbers are not NCAA historical results.</p>
+      <p id="summaryLine">Loading demo outputs...</p>
+      <p class="hint">Click a bar to highlight that team's games. <button type="button" id="clearTeam" style="margin-left:6px">Show all games</button></p>
+      <div class="chart" id="rankChart"></div>
+      <div class="chart" id="evalChart"></div>
+      <h2>Rankings</h2>
+      <p>Click a column header to sort. π is the Markov steady-state share.</p>
+      <table id="rankTable"></table>
+    </section>
+
+    <section id="orig" class="panel">
+      <p>From the Cornell report on late-1990s / early-2000s data. These are images from that report, not a live model, because the original Sports Reference file is not in this repo.</p>
+      <ul>
+        <li>Margin logistic roughly (a, b) ≈ (0.0504, 0.8052) with h = 2</li>
+        <li>About 63% of same-year NCAA tournament games predicted correctly across the years tabulated</li>
+        <li>About 68% when using one season’s model on the next tournament</li>
+      </ul>
+      <p>Same-year tournament predictions from the Cornell report:</p>
+      <img class="report" src="original_tournament_accuracy.png" alt="Same-year tournament predictions from the Cornell report" />
+    </section>
+
+    <p><a href="https://github.com/AjmalSirajudeen/ncaa-markov-ranking">Back to the repository</a></p>
+  </main>
+  <script src="data.js"></script>
+  <script>
+    function renderTable(rows, key, dir) {
+      const sorted = [...rows].sort((a, b) => {
+        const av = a[key], bv = b[key];
+        if (typeof av === "number") return (av - bv) * dir;
+        return String(av).localeCompare(String(bv)) * dir;
+      });
+      const table = document.getElementById("rankTable");
+      table.innerHTML =
+        "<thead><tr><th data-k='rank'>Rank</th><th data-k='team'>Team</th><th data-k='pi'>π</th></tr></thead><tbody>" +
+        sorted.map((r) => `<tr><td>${r.rank}</td><td>${r.team}</td><td>${r.pi.toFixed(4)}</td></tr>`).join("") +
+        "</tbody>";
+    }
+
+    function plotRanks(ranks, onSelect) {
+      const ordered = [...ranks].sort((a, b) => a.pi - b.pi);
+      Plotly.newPlot("rankChart", [{
+        type: "bar",
+        orientation: "h",
+        y: ordered.map((r) => r.team),
+        x: ordered.map((r) => r.pi),
+        customdata: ordered.map((r) => r.rank),
+        marker: { color: "#1d4ed8" },
+        hovertemplate: "%{y}<br>rank %{customdata}<br>π = %{x:.4f}<extra></extra>"
+      }], {
+        title: "Steady-state ranking (synthetic demo)",
+        xaxis: { title: "π" },
+        margin: { l: 130, r: 20, t: 48, b: 48 },
+        height: 440,
+        paper_bgcolor: "#fff",
+        plot_bgcolor: "#fff"
+      }, { responsive: true, displaylogo: false });
+
+      const el = document.getElementById("rankChart");
+      el.on("plotly_click", (ev) => onSelect(ev.points[0].y));
+      el.on("plotly_doubleclick", () => onSelect(null));
+    }
+
+    function plotEval(games, team) {
+      const rows = team
+        ? games.filter((g) => g.home_team === team || g.away_team === team)
+        : games;
+      const title = team
+        ? "Home-win result vs π gap: " + team
+        : "Home-win result vs π gap (synthetic demo)";
+      Plotly.newPlot("evalChart", [{
+        type: "scatter",
+        mode: "markers",
+        x: rows.map((g) => g.pi_diff),
+        y: rows.map((g) => g.actual_home_win ? 1 : 0),
+        customdata: rows.map((g) => [g.home_team, g.away_team, g.correct ? "yes" : "no"]),
+        marker: {
+          size: 9,
+          color: rows.map((g) => g.correct ? "#1d4ed8" : "#a8a29e")
+        },
+        hovertemplate: "%{customdata[0]} vs %{customdata[1]}<br>π gap = %{x:.3f}<br>home win = %{y}<br>π favorite correct = %{customdata[2]}<extra></extra>"
+      }], {
+        title,
+        xaxis: { title: "π_home − π_away" },
+        yaxis: { title: "Actual home win", tickvals: [0, 1], ticktext: ["No", "Yes"], range: [-0.2, 1.2] },
+        height: 380,
+        margin: { t: 48 },
+        paper_bgcolor: "#fff",
+        plot_bgcolor: "#fff",
+        annotations: [{
+          text: "Blue = higher-π favorite was correct",
+          showarrow: false,
+          xref: "paper", yref: "paper",
+          x: 0, y: 1.12, xanchor: "left",
+          font: { size: 12, color: "#57534e" }
+        }]
+      }, { responsive: true, displaylogo: false });
+    }
+
+    async function main() {
+      try {
+        const ranks = window.REPORT.ranks;
+        const games = window.REPORT.games;
+        const summary = window.REPORT.summary;
+        const acc = summary.regular_season_pi_favorite_accuracy;
+        document.getElementById("summaryLine").textContent =
+          "Higher-π favorite correct on " + acc.correct + " of " + acc.n +
+          " games (" + (100 * acc.accuracy).toFixed(1) + "%). Margin logistic a ≈ " +
+          summary.margin_logistic.a.toFixed(3) + ", b ≈ " +
+          summary.margin_logistic.b.toFixed(3) + ".";
+
+        let selected = null;
+        const redraw = (team) => {
+          selected = team;
+          plotEval(games, selected);
+        };
+        plotRanks(ranks, redraw);
+        plotEval(games, null);
+        document.getElementById("clearTeam").addEventListener("click", () => redraw(null));
+
+        let sortKey = "rank";
+        let sortDir = 1;
+        renderTable(ranks, sortKey, sortDir);
+        document.getElementById("rankTable").addEventListener("click", (e) => {
+          const th = e.target.closest("th");
+          if (!th) return;
+          const next = th.dataset.k;
+          sortDir = next === sortKey ? -sortDir : 1;
+          sortKey = next;
+          renderTable(ranks, sortKey, sortDir);
+        });
+      } catch (err) {
+        document.getElementById("summaryLine").className = "err";
+        document.getElementById("summaryLine").textContent =
+          "Could not load the demo outputs bundled with this page.";
+      }
+    }
+
+    document.querySelectorAll(".tabs button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tabs button").forEach((b) => b.classList.remove("on"));
+        document.querySelectorAll(".panel").forEach((p) => p.classList.remove("on"));
+        btn.classList.add("on");
+        document.getElementById(btn.dataset.tab).classList.add("on");
+        if (btn.dataset.tab === "demo") {
+          ["rankChart", "evalChart"].forEach((id) => {
+            const el = document.getElementById(id);
+            if (el && el.data) Plotly.Plots.resize(el);
+          });
+        }
+      });
+    });
+
+    main();
+  </script>
+</body>
+</html>
