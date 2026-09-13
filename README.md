@@ -156,11 +156,9 @@ Large raw files under `data/raw/` are gitignored.
 
 With no `--path` and no files in `data/raw/`, the pipeline runs on `data/sample/demo_season.csv` (synthetic data for a smoke test only).
 
-## Results
+## Original Cornell Study
 
-### From the original Cornell report
-
-On late-1990s / early-2000s data (not the demo below):
+These results are from the Cornell report on late-1990s / early-2000s NCAA data. They are **not** from the synthetic demo in this repo.
 
 - Margin logistic roughly $(a, b) \approx (0.0504, 0.8052)$ with $h = 2$
 - About **63%** of same-year NCAA tournament games predicted correctly across the years we tabulated
@@ -169,31 +167,19 @@ On late-1990s / early-2000s data (not the demo below):
 
 ![Same-year tournament predictions from the Cornell report](outputs/figures/original_tournament_accuracy.png)
 
-![Next-year tournament predictions from the Cornell report](outputs/figures/original_next_year_accuracy.png)
+## Current Python Reimplementation
 
-![2000 Final Four predicted vs actual spreads](outputs/figures/original_final_four_2000.png)
-
-### From this Python pipeline (demo only)
-
-Smoke test on the synthetic 12-team / 72-game season:
+Smoke test on the bundled synthetic 12-team / 72-game season (`data/sample/demo_season.csv`). These numbers are **not** NCAA historical results.
 
 - Re-fit margin logistic: $a \approx 0.160$, $b \approx -1.552$
 - Higher-$\pi$ favorite correct on **56/72** regular-season games (**77.8%**)
 - Details in `outputs/run_summary.json`
 
-Those demo numbers are not NCAA historical results. On your own data, the fitted coefficients and accuracy will be whatever that run produces.
-
-## Charts from this repo (synthetic demo)
-
-These four plots are from `scripts/run_pipeline.py` on the bundled demo season. They are not the 1999-2003 NCAA results.
-
-![Home score-margin histogram](outputs/figures/home_margin_hist.png)
+On your own data, coefficients and accuracy will be whatever that run produces.
 
 ![Logistic fit for road-win probability vs home margin](outputs/figures/logistic_margin_fit.png)
 
 ![Top teams by steady-state probability](outputs/figures/top_rankings.png)
-
-![Home win rate vs steady-state differential](outputs/figures/winrate_vs_pi_diff.png)
 
 ## Run it
 
