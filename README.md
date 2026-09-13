@@ -6,6 +6,18 @@ In grad school, my team built a logistic regression / Markov chain (LRMC) model 
 
 This repo recreates that workflow in Python. The original project used Sports Reference data with MATLAB, Excel, and Java, not this codebase.
 
+## What this is meant to show
+
+This is a portfolio analytics project, not a product and not a claim that I am a full-time software engineer.
+
+If you only have a minute, the point is:
+
+- I can take a quantitative method (logistic regression + a Markov chain) and turn it into a runnable pipeline: data in, rankings and charts out.
+- I can explain the model, not just the output: why a score margin becomes a probability, why that probability becomes a transition, and why the long-run distribution is a ranking.
+- I treat results as data-dependent. The Cornell paper has its own fitted numbers and tournament accuracy. This repo refits on whatever games you load. The bundled demo uses synthetic teams so the code runs immediately. It is not a 2003 tournament leaderboard.
+
+I use this next to an operations project (Atlanta airport delays) and product work (CRWLR). Together they are meant to read as: models, operations decisions, and product-building, not three copies of the same app.
+
 ## What the model does
 
 Public rankings (AP, RPI, seeds) compress a season into an ordering. LRMC is more explicit about the path from game results to that ordering:
@@ -205,4 +217,4 @@ Python 3, pandas, numpy, scikit-learn, matplotlib, pytest. Steady state is solve
 
 ## Why I keep this around
 
-I still like this project because the ideas are concrete: you can point at a game, a probability, a matrix entry, and a ranking, and explain how they connect. Rebuilding it in Python was mostly about making that chain easy to run, inspect, and talk through, including being clear about what came from the original study versus what this repo actually computes on demo or user-supplied data.
+The useful part is still the chain you can point at: a game, a probability, a matrix entry, a ranking. If that chain is clear, the repo did its job.
