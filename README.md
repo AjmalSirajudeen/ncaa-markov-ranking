@@ -167,6 +167,12 @@ On late-1990s / early-2000s data (not the demo below):
 - About **68%** when using one season’s model on the next tournament
 - We also compared predicted Final Four point spreads (e.g. 2000) to actual margins
 
+![Same-year tournament predictions from the Cornell report](outputs/figures/original_tournament_accuracy.png)
+
+![Next-year tournament predictions from the Cornell report](outputs/figures/original_next_year_accuracy.png)
+
+![2000 Final Four predicted vs actual spreads](outputs/figures/original_final_four_2000.png)
+
 ### From this Python pipeline (demo only)
 
 Smoke test on the synthetic 12-team / 72-game season:
@@ -177,14 +183,17 @@ Smoke test on the synthetic 12-team / 72-game season:
 
 Those demo numbers are not NCAA historical results. On your own data, the fitted coefficients and accuracy will be whatever that run produces.
 
-## Charts
+## Charts from this repo (synthetic demo)
 
-`scripts/run_pipeline.py` writes four plots to `outputs/figures/` (or `--out-dir`):
+These four plots are from `scripts/run_pipeline.py` on the bundled demo season. They are not the 1999-2003 NCAA results.
 
-1. Home score-margin histogram
-2. Logistic fit for road-win probability vs home margin
-3. Top teams by steady-state $\pi$
-4. Home win rate vs $\pi$ differential
+![Home score-margin histogram](outputs/figures/home_margin_hist.png)
+
+![Logistic fit for road-win probability vs home margin](outputs/figures/logistic_margin_fit.png)
+
+![Top teams by steady-state probability](outputs/figures/top_rankings.png)
+
+![Home win rate vs steady-state differential](outputs/figures/winrate_vs_pi_diff.png)
 
 ## Run it
 
