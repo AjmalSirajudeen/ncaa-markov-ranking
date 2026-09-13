@@ -6,17 +6,13 @@ In grad school, my team built a logistic regression / Markov chain (LRMC) model 
 
 This repo recreates that workflow in Python. The original project used Sports Reference data with MATLAB, Excel, and Java, not this codebase.
 
-## What this is meant to show
+## What this project demonstrates
 
-This is a portfolio analytics project, not a product and not a claim that I am a full-time software engineer.
-
-If you only have a minute, the point is:
-
-- I can take a quantitative method (logistic regression + a Markov chain) and turn it into a runnable pipeline: data in, rankings and charts out.
-- I can explain the model, not just the output: why a score margin becomes a probability, why that probability becomes a transition, and why the long-run distribution is a ranking.
-- I treat results as data-dependent. The Cornell paper has its own fitted numbers and tournament accuracy. This repo refits on whatever games you load. The bundled demo uses synthetic teams so the code runs immediately. It is not a 2003 tournament leaderboard.
-
-I use this next to an operations project (Atlanta airport delays) and product work (CRWLR). Together they are meant to read as: models, operations decisions, and product-building, not three copies of the same app.
+- Game-level scores turned into home margins and home-and-home pair features
+- Logistic regression from score margin to a probability that one team is stronger
+- A Markov transition matrix over teams, with ranking from the steady-state distribution $\pi$
+- Matchup evaluation: how often the higher-$\pi$ team wins
+- A full run on supplied game data (or the bundled synthetic demo), with rankings and charts written to `outputs/`
 
 ## What the model does
 
